@@ -35,7 +35,16 @@
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         
         @media (max-width: 600px) { .video-grid { grid-template-columns: 1fr; } }
-        @media print { .no-print, .btn-primary, .video-section { display: none !important; } body { background: white; } .container { box-shadow: none; border: none; width: 100%; } }
+
+        /* PDF/PRINT OPTIMIZATIONS */
+        @media print { 
+            .no-print, .btn-primary, .video-section, #form-view { display: none !important; } 
+            #report-output { display: block !important; }
+            body { background: white; padding: 0; } 
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; } 
+            .gift-card { border: none; padding: 10px 0; margin-bottom: 15px; page-break-inside: avoid; }
+            .section-title { background: #eee !important; color: black !important; -webkit-print-color-adjust: exact; }
+        }
     </style>
 </head>
 <body>
@@ -107,8 +116,8 @@
         },
         tl: {
             title: "Listahan ng mga Espirituwal na Kaloob",
-            sub: "Isang pamamaraan upang matulungan kang matuklasan ang iyong mga kaloob. Lagyan ng tsek ang mga aytem na pinakamahusay na naglalarawan sa iyo",
-            instr: "I-click ang kahit saan sa hanay para piliin ito.",
+            sub: "Isang pamamaraan upang matulungan kang matuklasan ang iyong mga kaloob. Lagyan ng tsek ang mga aytem na pinakamahusay na naglalarawan sa iyo.",
+            instr: "Lagyan ng tsek ang mga aytem na pinakamahusay na naglalarawan sa iyo.",
             discover: "Tuklasin ang aking mga espirituwal na kaloob",
             strengths: "MGA PANGUNAHING KALAKASAN SA MINISTERYO",
             appendix: "BUONG DESKRIPSYON NG MGA KATEGORYA",
@@ -208,7 +217,6 @@
         currentLang = currentLang === 'en' ? 'tl' : 'en';
         document.getElementById('lang-toggle').innerText = currentLang === 'en' ? '🇵🇭 Tagalog' : '🇺🇸 English';
         
-        // Update UI Text
         const langData = uiText[currentLang];
         document.getElementById('main-title').innerText = langData.title;
         document.getElementById('sub-title').innerText = langData.sub;
@@ -232,11 +240,11 @@
 
         Object.keys(database).forEach(key => {
             const gift = database[key][currentLang];
-            const content = `<div class="gift-card"><span class="level-header">Level ${key}. ${gift.title}</span>${gift.text}</div>`;
+            const content = `<div class="gift-card"><span class="level-header">Level ${key}. ${gift.title}</span><p>${gift.text}</p></div>`;
             if (scores[key] >= 3) {
                 idContainer.innerHTML += content.replace('</span>', ` (${uiText[currentLang].score}: ${scores[key]})</span>`);
             }
-            appContainer.innerHTML += `<div style="margin-bottom:15px"><strong>Level ${key}. ${gift.title}:</strong> ${gift.text}</div>`;
+            appContainer.innerHTML += `<div class="gift-card" style="border-left: 2px solid #ccc;"><span class="level-header">Level ${key}. ${gift.title}</span><p>${gift.text}</p></div>`;
         });
 
         document.getElementById('form-view').style.display = 'none';
@@ -245,11 +253,33 @@
     }
 
     function downloadPDF() {
+        // Ensure report is generated before download
+        generateDocument();
+        
         const element = document.getElementById('printable-doc');
-        html2pdf().from(element).save(`Spiritual_Gifts_Report_${currentLang}.pdf`);
+        const opt = {
+            margin:       0.5,
+            filename:     `Spiritual_Gifts_Report_${currentLang}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        // New logic: Temporarily show hidden sections for PDF capture, then revert
+        const formView = document.getElementById('form-view');
+        const reportOutput = document.getElementById('report-output');
+        const originalFormDisplay = formView.style.display;
+        const originalReportDisplay = reportOutput.style.display;
+
+        formView.style.display = 'none';
+        reportOutput.style.display = 'block';
+
+        html2pdf().set(opt).from(element).save().then(() => {
+            formView.style.display = originalFormDisplay;
+            reportOutput.style.display = originalReportDisplay;
+        });
     }
 
-    // Initial load
     renderQuestions();
 </script>
 </body>
