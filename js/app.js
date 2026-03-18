@@ -187,7 +187,7 @@ function renderReport() {
     document.getElementById('title-strengths').textContent = langData.strengths;
     document.getElementById('title-appendix').textContent = langData.appendix;
     document.getElementById('title-resources').textContent = langData.resources;
-    document.getElementById('btn-pdf').textContent = `📄 ${langData.pdf}`;
+    //document.getElementById('btn-pdf').textContent = `📄 ${langData.pdf}`;
     document.getElementById('btn-reset').textContent = `🔄 ${langData.reset}`;
 }
 
@@ -260,7 +260,7 @@ function populatePDFTemplate() {
 }
 
 // Download PDF
-function downloadPDF() {
+async function downloadPDF() {
     const btn = document.getElementById('btn-pdf');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<span class="loading"></span> Generating...';
@@ -269,9 +269,11 @@ function downloadPDF() {
     populatePDFTemplate();
 
     const element = document.getElementById('pdf-template');
-    element.style.display = 'block';
-    element.style.position = 'absolute';
-    element.style.left = '-9999px';
+	element.style.display = 'block';
+	element.style.visibility = 'hidden';
+	element.style.position = 'fixed';
+	element.style.top = '0';
+	element.style.left = '0';
 
     const opt = {
         margin: [15, 15, 15, 15],
@@ -294,6 +296,8 @@ function downloadPDF() {
             avoid: '.pdf-gift-card'
         }
     };
+	
+	await new Promise(resolve => setTimeout(resolve, 300));
 
     html2pdf().set(opt).from(element).save().then(() => {
         element.style.display = 'none';
