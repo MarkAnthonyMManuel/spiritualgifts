@@ -3,176 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spiritual Gifts Assessment Report</title>
+    <title>Spiritual Gifts Inventory Report</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root {
-            --primary: #1e293b;
-            --accent: #2563eb;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #334155;
-            --border: #e2e8f0;
-        }
-
-        [data-theme="dark"] {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f1f5f9;
-            --border: #334155;
-            --primary: #f8fafc;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 850px;
-            margin: 0 auto;
-            background: var(--card);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .no-print-tools {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            border: 1px solid var(--border);
-            transition: 0.2s;
-        }
-
-        .btn-primary { background: var(--accent); color: white; border: none; }
-        .btn-theme { background: var(--card); color: var(--text); }
-
-        header {
-            text-align: center;
-            border-bottom: 3px solid var(--accent);
-            padding-bottom: 25px;
-            margin-bottom: 35px;
-        }
-
-        h1 { margin: 0; color: var(--primary); font-size: 2.2rem; letter-spacing: -0.025em; }
-        .doc-meta { font-size: 1rem; color: #64748b; margin-top: 8px; font-weight: 500; }
-
-        .question-row {
-            display: flex;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .question-text { flex: 1; padding-right: 15px; font-size: 1rem; }
-        .cat-badge { font-size: 0.75rem; font-weight: 800; background: var(--bg); padding: 4px 8px; border-radius: 6px; color: var(--accent); border: 1px solid var(--border); }
-
-        #report-output { display: none; }
+        :root { --primary: #1e293b; --accent: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #334155; --border: #e2e8f0; }
+        [data-theme="dark"] { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --border: #334155; --primary: #f8fafc; }
         
-        .section-title {
-            color: var(--accent);
-            background: var(--bg);
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin: 40px 0 20px;
-            font-size: 1.25rem;
-            font-weight: 800;
-        }
-
-        .gift-card {
-            margin-bottom: 25px;
-            padding: 20px;
-            background: var(--card);
+        body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: 0 auto; background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        
+        .no-print { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+        .btn { padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; border: 1px solid var(--border); transition: 0.2s; }
+        .btn-primary { background: var(--accent); color: white; border: none; width: 100%; font-size: 1.2rem; padding: 20px; margin-top: 20px; }
+        
+        header { text-align: center; border-bottom: 3px solid var(--accent); padding-bottom: 25px; margin-bottom: 35px; }
+        
+        .question-row { 
+            display: flex; 
+            align-items: center; 
+            padding: 15px; 
+            border-bottom: 1px solid var(--border); 
+            cursor: pointer; 
             border-radius: 8px;
-            border: 1px solid var(--border);
-            border-left: 5px solid var(--accent);
+            margin-bottom: 4px;
+            user-select: none;
         }
+        .question-row:hover { background-color: rgba(37, 99, 235, 0.05); }
+        .question-row.selected { background-color: rgba(37, 99, 235, 0.1); border-left: 4px solid var(--accent); }
+        
+        .cat-badge { font-size: 0.75rem; font-weight: 800; background: var(--bg); padding: 4px 8px; border-radius: 6px; color: var(--accent); border: 1px solid var(--border); margin-left: auto; }
+        
+        #report-output { display: none; }
+        .section-title { color: var(--accent); background: var(--bg); padding: 10px 15px; border-radius: 6px; margin: 40px 0 20px; font-weight: 800; text-transform: uppercase; }
+        
+        .gift-card { margin-bottom: 25px; padding: 20px; background: var(--card); border-radius: 8px; border: 1px solid var(--border); border-left: 5px solid var(--accent); }
+        .level-header { font-weight: 900; color: var(--primary); display: block; margin-bottom: 8px; font-size: 1.1rem; }
 
-        .gift-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .level-indicator {
-            font-weight: 900;
-            font-size: 1.1rem;
-            color: var(--primary);
-        }
-
-        .score-pill {
-            background: var(--accent);
-            color: white;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-
-        .appendix-item {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px dashed var(--border);
-        }
-
-        .appendix-label {
-            font-weight: 800;
-            color: var(--accent);
-        }
-
-        @media print {
-            .no-print-tools, .btn-generate { display: none !important; }
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
-        }
+        /* Video Section Styling */
+        .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 8px; overflow: hidden; background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        
+        @media (max-width: 600px) { .video-grid { grid-template-columns: 1fr; } }
+        @media print { .no-print, .btn-primary, .video-section { display: none !important; } body { background: white; } .container { box-shadow: none; border: none; width: 100%; } }
     </style>
 </head>
 <body>
 
-<div class="no-print-tools">
-    <button class="btn btn-theme" onclick="toggleTheme()">🌓 Toggle Mode</button>
-</div>
+<div class="no-print"><button class="btn" onclick="document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'">🌓 Theme</button></div>
 
 <div class="container" id="printable-doc">
     <header>
         <h1>Spiritual Gifts Inventory</h1>
-        <div class="doc-meta">A method to help you discover your gifts. Check the items which best describe you.</div>
+        <div style="color:#64748b; font-weight: 500;">Official Evaluation & Romans 12 Analysis</div>
     </header>
 
     <div id="form-view">
+        <p style="text-align:center; color: var(--accent); font-weight: bold;">Click anywhere on a row to select it.</p>
         <div id="questions-list"></div>
-        <button class="btn btn-primary" style="width:100%; margin-top:30px; padding:20px; font-size:1.2rem;" onclick="generateDocument()">Generate Formal Report</button>
+        <button class="btn btn-primary" onclick="generateDocument()">Discover my spiritual gifts</button>
     </div>
 
     <div id="report-output">
         <div class="section-title">PRIMARY MINISTRY STRENGTHS</div>
         <div id="identified-gifts-container"></div>
-
-        <div class="section-title" style="background: #f1f5f9; color: #475569;">APPENDIX: FULL CATEGORY DESCRIPTIONS</div>
-        <div id="appendix-container"></div>
         
-        <div style="margin-top: 50px; display: flex; gap: 15px;" class="no-print-tools-inline">
-            <button class="btn btn-primary" onclick="downloadPDF()" style="flex:2">Download as PDF Document</button>
-            <button class="btn" onclick="window.location.reload()" style="flex:1">Restart Inventory</button>
+        <div class="section-title" style="background: #f1f5f9; color: #475569;">FULL CATEGORY DESCRIPTIONS</div>
+        <div id="appendix-container"></div>
+
+        <div class="video-section">
+            <div class="section-title">Growth Resources</div>
+            <div class="video-grid">
+                <div>
+                    <p style="font-weight:bold; margin-bottom:8px;">7 Habits of Believers</p>
+                    <div class="video-wrapper">
+                        <iframe src="https://www.youtube.com/embed/GT0fro5ANcM" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div>
+                    <p style="font-weight:bold; margin-bottom:8px;">Fruit of the Spirit</p>
+                    <div class="video-wrapper">
+                        <iframe src="https://www.youtube.com/embed/qG9SbXG9BaY" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-top: 40px;">
+            <button class="btn btn-primary" onclick="downloadPDF()" style="flex: 2;">Download PDF Document</button>
+            <button class="btn btn-primary" style="background: #64748b; flex: 1;" onclick="window.location.reload()">Reset Test</button>
         </div>
     </div>
 </div>
 
 <script>
+    // [Keep your existing 'questions' and 'database' arrays here...]
     const questions = [
         { id: 1, text: "I prefer ministering by myself rather than in a group.", cat: "G" },
         { id: 2, text: "People often say I am impulsive and direct.", cat: "F" },
@@ -219,70 +144,43 @@
 
     const listEl = document.getElementById('questions-list');
     questions.forEach(q => {
-        listEl.innerHTML += `
-            <div class="question-row">
-                <input type="checkbox" id="q${q.id}" data-cat="${q.cat}" style="transform: scale(1.4); margin-right: 15px;">
-                <label class="question-text" for="q${q.id}">${q.text}</label>
-                <span class="cat-badge">${q.cat}</span>
-            </div>
+        const row = document.createElement('div');
+        row.className = 'question-row';
+        row.innerHTML = `
+            <input type="checkbox" id="q${q.id}" data-cat="${q.cat}" style="transform:scale(1.3); margin-right:15px;">
+            <label style="flex:1; cursor:pointer;">${q.text}</label>
+            <span class="cat-badge">Level ${q.cat}</span>
         `;
+        row.onclick = (e) => {
+            const cb = row.querySelector('input');
+            if (e.target.tagName !== 'INPUT') cb.checked = !cb.checked;
+            row.classList.toggle('selected', cb.checked);
+        };
+        listEl.appendChild(row);
     });
 
     function generateDocument() {
         const scores = {A:0, B:0, C:0, D:0, E:0, F:0, G:0};
         document.querySelectorAll('input:checked').forEach(i => scores[i.dataset.cat]++);
-
         const idContainer = document.getElementById('identified-gifts-container');
         const appContainer = document.getElementById('appendix-container');
-        idContainer.innerHTML = '';
-        appContainer.innerHTML = '';
+        idContainer.innerHTML = appContainer.innerHTML = '';
 
         Object.keys(database).forEach(key => {
             const gift = database[key];
-            const score = scores[key];
-            
-            if (score >= 3) {
-                idContainer.innerHTML += `
-                    <div class="gift-card">
-                        <div class="gift-header">
-                            <span class="level-indicator">${gift.level}: ${gift.title}</span>
-                            <span class="score-pill">Frequency: ${score}/5</span>
-                        </div>
-                        <p style="margin:0;">${gift.text}</p>
-                    </div>
-                `;
-            }
-            
-            // Add all to appendix for full reference
-            appContainer.innerHTML += `
-                <div class="appendix-item">
-                    <span class="appendix-label">${gift.level} - ${gift.title}:</span> ${gift.text}
-                </div>
-            `;
+            const content = `<div class="gift-card"><span class="level-header">Level ${gift.level}. ${gift.title}</span>${gift.text}</div>`;
+            if (scores[key] >= 3) idContainer.innerHTML += content.replace('</span>', ` (Frequency Score: ${scores[key]})</span>`);
+            appContainer.innerHTML += `<div style="margin-bottom:15px"><strong>Level ${gift.level}. ${gift.title}:</strong> ${gift.text}</div>`;
         });
-
-        if (idContainer.innerHTML === '') idContainer.innerHTML = '<p>No primary gifts were identified with a score of 3 or higher.</p>';
 
         document.getElementById('form-view').style.display = 'none';
         document.getElementById('report-output').style.display = 'block';
         window.scrollTo(0,0);
     }
 
-    function toggleTheme() {
-        const b = document.body;
-        b.dataset.theme = b.dataset.theme === 'dark' ? 'light' : 'dark';
-    }
-
     function downloadPDF() {
         const element = document.getElementById('printable-doc');
-        const opt = {
-            margin: [10, 10],
-            filename: 'Spiritual_Gifts_Full_Report.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
+        html2pdf().from(element).save('Spiritual_Gifts_Inventory_Report.pdf');
     }
 </script>
 </body>
