@@ -9,25 +9,16 @@
         :root { --primary: #1e293b; --accent: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #334155; --border: #e2e8f0; }
         [data-theme="dark"] { --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --border: #334155; --primary: #f8fafc; }
         
-        body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; transition: 0.3s; }
         .container { max-width: 850px; margin: 0 auto; background: var(--card); padding: 40px; border-radius: 12px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
         
-        .no-print { position: fixed; top: 20px; right: 20px; z-index: 1000; }
-        .btn { padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; border: 1px solid var(--border); transition: 0.2s; }
+        .no-print { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 8px; }
+        .btn { padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; border: 1px solid var(--border); transition: 0.2s; background: var(--card); color: var(--text); }
         .btn-primary { background: var(--accent); color: white; border: none; width: 100%; font-size: 1.2rem; padding: 20px; margin-top: 20px; }
         
         header { text-align: center; border-bottom: 3px solid var(--accent); padding-bottom: 25px; margin-bottom: 35px; }
         
-        .question-row { 
-            display: flex; 
-            align-items: center; 
-            padding: 15px; 
-            border-bottom: 1px solid var(--border); 
-            cursor: pointer; 
-            border-radius: 8px;
-            margin-bottom: 4px;
-            user-select: none;
-        }
+        .question-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 8px; margin-bottom: 4px; user-select: none; }
         .question-row:hover { background-color: rgba(37, 99, 235, 0.05); }
         .question-row.selected { background-color: rgba(37, 99, 235, 0.1); border-left: 4px solid var(--accent); }
         
@@ -39,7 +30,6 @@
         .gift-card { margin-bottom: 25px; padding: 20px; background: var(--card); border-radius: 8px; border: 1px solid var(--border); border-left: 5px solid var(--accent); }
         .level-header { font-weight: 900; color: var(--primary); display: block; margin-bottom: 8px; font-size: 1.1rem; }
 
-        /* Video Section Styling */
         .video-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 8px; overflow: hidden; background: #000; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
@@ -50,38 +40,41 @@
 </head>
 <body>
 
-<div class="no-print"><button class="btn" onclick="document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'">🌓 Theme</button></div>
+<div class="no-print">
+    <button class="btn" id="lang-toggle" onclick="toggleLanguage()">🇵🇭 Tagalog</button>
+    <button class="btn" onclick="document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark'">🌓 Theme</button>
+</div>
 
 <div class="container" id="printable-doc">
     <header>
-        <h1>Spiritual Gifts Inventory</h1>
-        <div style="color:#64748b; font-weight: 500;">A method to help you discover your gifts. Check the items which best describe you. </div>
+        <h1 id="main-title">Spiritual Gifts Inventory</h1>
+        <div id="sub-title" style="color:#64748b; font-weight: 500;">Official Evaluation & Romans 12 Analysis</div>
     </header>
 
     <div id="form-view">
-        <p style="text-align:center; color: var(--accent); font-weight: bold;">Click anywhere on a row to select it.</p>
+        <p id="instruction-text" style="text-align:center; color: var(--accent); font-weight: bold;">Click anywhere on a row to select it.</p>
         <div id="questions-list"></div>
-        <button class="btn btn-primary" onclick="generateDocument()">Discover my spiritual gifts</button>
+        <button class="btn btn-primary" id="btn-discover" onclick="generateDocument()">Discover my spiritual gifts</button>
     </div>
 
     <div id="report-output">
-        <div class="section-title">PRIMARY MINISTRY STRENGTHS</div>
+        <div class="section-title" id="title-strengths">PRIMARY MINISTRY STRENGTHS</div>
         <div id="identified-gifts-container"></div>
         
-        <div class="section-title" style="background: #f1f5f9; color: #475569;">FULL CATEGORY DESCRIPTIONS</div>
+        <div class="section-title" id="title-appendix" style="background: #f1f5f9; color: #475569;">FULL CATEGORY DESCRIPTIONS</div>
         <div id="appendix-container"></div>
 
         <div class="video-section">
-            <div class="section-title">Video to watch</div>
+            <div class="section-title" id="title-resources">Growth Resources</div>
             <div class="video-grid">
                 <div>
-                    <p style="font-weight:bold; margin-bottom:8px;">7 Habits of Spirit-Filled Believers</p>
+                    <p style="font-weight:bold; margin-bottom:8px;">7 Habits of Believers</p>
                     <div class="video-wrapper">
                         <iframe src="https://www.youtube.com/embed/GT0fro5ANcM" allowfullscreen></iframe>
                     </div>
                 </div>
                 <div>
-                    <p style="font-weight:bold; margin-bottom:8px;">Fruit of the Spirit" (Galatians 5:22-23) SONGS </p>
+                    <p style="font-weight:bold; margin-bottom:8px;">Fruit of the Spirit</p>
                     <div class="video-wrapper">
                         <iframe src="https://www.youtube.com/embed/qG9SbXG9BaY" allowfullscreen></iframe>
                     </div>
@@ -90,74 +83,145 @@
         </div>
         
         <div style="display: flex; gap: 10px; margin-top: 40px;">
-            <button class="btn btn-primary" onclick="downloadPDF()" style="flex: 2;">Download PDF Document</button>
-            <button class="btn btn-primary" style="background: #64748b; flex: 1;" onclick="window.location.reload()">Reset Test</button>
+            <button class="btn btn-primary" id="btn-pdf" onclick="downloadPDF()" style="flex: 2;">Download PDF Document</button>
+            <button class="btn btn-primary" id="btn-reset" style="background: #64748b; flex: 1;" onclick="window.location.reload()">Reset Test</button>
         </div>
     </div>
 </div>
 
 <script>
-    // [Keep your existing 'questions' and 'database' arrays here...]
+    let currentLang = 'en';
+
+    const uiText = {
+        en: {
+            title: "Spiritual Gifts Inventory",
+            sub: "Official Evaluation & Romans 12 Analysis",
+            instr: "Click anywhere on a row to select it.",
+            discover: "Discover my spiritual gifts",
+            strengths: "PRIMARY MINISTRY STRENGTHS",
+            appendix: "FULL CATEGORY DESCRIPTIONS",
+            resources: "Growth Resources",
+            pdf: "Download PDF Document",
+            reset: "Reset Test",
+            score: "Frequency Score"
+        },
+        tl: {
+            title: "Listahan ng mga Espirituwal na Kaloob",
+            sub: "Opisyal na Pagsusuri at Pagsusuri sa Roma 12",
+            instr: "I-click ang kahit saan sa hanay para piliin ito.",
+            discover: "Tuklasin ang aking mga espirituwal na kaloob",
+            strengths: "MGA PANGUNAHING KALAKASAN SA MINISTERYO",
+            appendix: "BUONG DESKRIPSYON NG MGA KATEGORYA",
+            resources: "Mga Mapagkukunan para sa Paglago",
+            pdf: "I-download ang PDF na Dokumento",
+            reset: "Ulitin ang Test",
+            score: "Iskor ng Dalas"
+        }
+    };
+
     const questions = [
-        { id: 1, text: "I prefer ministering by myself rather than in a group.", cat: "G" },
-        { id: 2, text: "People often say I am impulsive and direct.", cat: "F" },
-        { id: 3, text: "My financial resources are above average.", cat: "A" },
-        { id: 4, text: "I like to counsel people on a short-term basis.", cat: "D" },
-        { id: 5, text: "I am a task-oriented person.", cat: "G" },
-        { id: 6, text: "I love directing other people's work.", cat: "B" },
-        { id: 7, text: "It's natural for me to show kindness to people.", cat: "E" },
-        { id: 8, text: "People learn easily from me.", cat: "C" },
-        { id: 9, text: "I can be very persuasive.", cat: "F" },
-        { id: 10, text: "More than 10 percent of my income goes for Christian causes.", cat: "A" },
-        { id: 11, text: "People often follow my advice.", cat: "D" },
-        { id: 12, text: "I normally use several books in lesson preparation.", cat: "C" },
-        { id: 13, text: "I like to recruit and lead people.", cat: "B" },
-        { id: 14, text: "One-on-one relationships are important to me.", cat: "E" },
-        { id: 15, text: "I possess a variety of talents and abilities.", cat: "G" },
-        { id: 16, text: "I want to measure everything by God's Word.", cat: "F" },
-        { id: 17, text: "Material possessions don't mean much to me.", cat: "A" },
-        { id: 18, text: "Discouraged people are encouraged by my words.", cat: "D" },
-        { id: 19, text: "Being accurate and truthful are important to me.", cat: "C" },
-        { id: 20, text: "I love the challenge of accomplishing an organization goal.", cat: "G" },
-        { id: 21, text: "Other people's spiritual welfare genuinely concerns me.", cat: "D" },
-        { id: 22, text: "I usually make quick decisions.", cat: "F" },
-        { id: 23, text: "I look for ways to help the unfortunate and downtrodden.", cat: "E" },
-        { id: 24, text: "Criticism doesn't bother me.", cat: "C" },
-        { id: 25, text: "I often volunteer my time and talents to worthwhile causes.", cat: "G" },
-        { id: 26, text: "I am usually self-confident.", cat: "B" },
-        { id: 27, text: "I don't expect repayment for favors I do for others.", cat: "E" },
-        { id: 28, text: "I enjoy being responsible for the success of the group.", cat: "B" },
-        { id: 29, text: "When a question about truth comes up, I am normally right.", cat: "F" },
-        { id: 30, text: "Deadlines challenge me, and I usually meet them on time.", cat: "B" },
-        { id: 31, text: "People in pain are comforted by my presence.", cat: "D" }
+        { id: 1, cat: "G", en: "I prefer ministering by myself rather than in a group.", tl: "Mas gusto kong maglingkod nang mag-isa kaysa sa isang grupo." },
+        { id: 2, cat: "F", en: "People often say I am impulsive and direct.", tl: "Madalas sabihin ng mga tao na ako ay pabigla-bigla at prangka." },
+        { id: 3, cat: "A", en: "My financial resources are above average.", tl: "Ang aking pinansyal na mapagkukunan ay higit sa karaniwan." },
+        { id: 4, cat: "D", en: "I like to counsel people on a short-term basis.", tl: "Gusto kong magpayo sa mga tao sa maikling panahon." },
+        { id: 5, cat: "G", en: "I am a task-oriented person.", tl: "Ako ay isang taong nakatuon sa gawain." },
+        { id: 6, cat: "B", en: "I love directing other people's work.", tl: "Mahal ko ang pagdidirekta sa trabaho ng ibang tao." },
+        { id: 7, cat: "E", en: "It's natural for me to show kindness to people.", tl: "Likas sa akin ang magpakita ng kabaitan sa mga tao." },
+        { id: 8, cat: "C", en: "People learn easily from me.", tl: "Madaling matuto ang mga tao mula sa akin." },
+        { id: 9, cat: "F", en: "I can be very persuasive.", tl: "Maaari akong maging napaka-mapanghikayat." },
+        { id: 10, cat: "A", en: "More than 10 percent of my income goes for Christian causes.", tl: "Higit sa 10 porsiyento ng aking kita ay napupunta sa mga gawaing Kristiyano." },
+        { id: 11, cat: "D", en: "People often follow my advice.", tl: "Madalas sundin ng mga tao ang aking payo." },
+        { id: 12, cat: "C", en: "I normally use several books in lesson preparation.", tl: "Karaniwan akong gumagamit ng ilang mga libro sa paghahanda ng aralin." },
+        { id: 13, cat: "B", en: "I like to recruit and lead people.", tl: "Gusto kong mag-recruit at mamuno ng mga tao." },
+        { id: 14, cat: "E", en: "One-on-one relationships are important to me.", tl: "Ang one-on-one na relasyon ay mahalaga sa akin." },
+        { id: 15, cat: "G", en: "I possess a variety of talents and abilities.", tl: "Nagtataglay ako ng iba't ibang mga talento at kakayahan." },
+        { id: 16, cat: "F", en: "I want to measure everything by God's Word.", tl: "Gusto kong sukatin ang lahat sa pamamagitan ng Salita ng Diyos." },
+        { id: 17, cat: "A", en: "Material possessions don't mean much to me.", tl: "Ang mga materyal na pag-aari ay hindi gaanong mahalaga sa akin." },
+        { id: 18, cat: "D", en: "Discouraged people are encouraged by my words.", tl: "Ang mga taong pinanghihinaan ng loob ay nabibigyang-lakas ng aking mga salita." },
+        { id: 19, cat: "C", en: "Being accurate and truthful are important to me.", tl: "Ang pagiging tumpak at tapat ay mahalaga sa akin." },
+        { id: 20, cat: "G", en: "I love the challenge of accomplishing an organization goal.", tl: "Gusto ko ang hamon ng pagkamit ng isang layunin ng organisasyon." },
+        { id: 21, cat: "D", en: "Other people's spiritual welfare genuinely concerns me.", tl: "Ang espirituwal na kapakanan ng ibang tao ay tunay na mahalaga sa akin." },
+        { id: 22, cat: "F", en: "I usually make quick decisions.", tl: "Karaniwan akong gumagawa ng mabilis na desisyon." },
+        { id: 23, cat: "E", en: "I look for ways to help the unfortunate and downtrodden.", tl: "Naghahanap ako ng mga paraan upang matulungan ang mga kapus-palad." },
+        { id: 24, cat: "C", en: "Criticism doesn't bother me.", tl: "Hindi ako naaabala ng mga kritismo." },
+        { id: 25, cat: "G", en: "I often volunteer my time and talents to worthwhile causes.", tl: "Madalas kong ibigay ang aking oras at talento para sa mga makabuluhang layunin." },
+        { id: 26, cat: "B", en: "I am usually self-confident.", tl: "Karaniwan akong may tiwala sa sarili." },
+        { id: 27, cat: "E", en: "I don't expect repayment for favors I do for others.", tl: "Hindi ako umaasa ng kabayaran para sa mga pabor na ginagawa ko sa iba." },
+        { id: 28, cat: "B", en: "I enjoy being responsible for the success of the group.", tl: "Nasisiyahan akong maging responsable para sa tagumpay ng grupo." },
+        { id: 29, cat: "F", en: "When a question about truth comes up, I am normally right.", tl: "Kapag may lumabas na tanong tungkol sa katotohanan, karaniwan akong tama." },
+        { id: 30, cat: "B", en: "Deadlines challenge me, and I usually meet them on time.", tl: "Hinahamon ako ng mga deadline, at karaniwan ko itong natatapos sa oras." },
+        { id: 31, cat: "D", en: "People in pain are comforted by my presence.", tl: "Ang mga taong nasasaktan ay naaaliw sa aking presensya." }
     ];
 
     const database = {
-        A: { title: "GIVING", level: "A", text: "You contribute material resources, and do God’s work with liberality and cheerfulness. You contribute sacrificially, motivate others, and don’t shun pressure or publicity. Romans 12:13 – “Share with God’s people.”" },
-        B: { title: "ADMINISTRATION", level: "B", text: "You lead and communicate in such a way that people work harmoniously to reach goals for God’s purpose. You enjoy being a leader and can endure adverse reaction to get the job done. You enjoy seeing tasks complete; are able to set guidelines, schedules, and policies; and can delegate to get the work done. Romans 12:14 – “Bless those who persecute you.”" },
-        C: { title: "TEACHING", level: "C", text: "You communicate the truth with obvious results. You believe your gift is foundational and work systematically and with accuracy. Romans 12:11 – “Keep spiritual fervor.”" },
-        D: { title: "EXHORTATION", level: "D", text: "You minister by giving comfort, consolation, and encouragement so people feel helped and healed. Problems are only challenges, and you are drawn to those seeking spiritual growth. You can share personal failures to prompt others to talk. Learning and teaching practical information is your desire. Romans 12:12 – “Joyful, patient and faithful.”" },
-        E: { title: "MERCY", level: "E", text: "You feel compassion for those who are suffering and perform deeds to reflect God’s love. You are naturally drawn to hurting people, sensitive, giving, loving and desire healing. Romans 12:15-16 – “Rejoice with those who rejoice, mourn with mourners, live in harmony.”" },
-        F: { title: "PROPHECY", level: "F", text: "The goal of those who have the gift of prophecy is to bring persons face to face with God. You discern, reveal motives and actions, have strong convictions and a need to express them. Impulsive, direct, and persuasive, you normally are a strong person. Romans 12:9 – “Love must be sincere, hate evil, cling to good.”" },
-        G: { title: "SERVING", level: "G", text: "You identify and meet the needs of others using personal as well as other resources. You see needs and enjoy responding. You work best short-term and alone (do it now and quickly). You possess endurance and stamina and have a tendency to do too much. Romans 12:10 – “Be devoted, honor one another.”" }
+        A: { 
+            en: { title: "GIVING", text: "You contribute material resources, and do God’s work with liberality and cheerfulness. Romans 12:13 – “Share with God’s people.”" },
+            tl: { title: "PAGBIBIGAY", text: "Nag-aambag ka ng mga materyal na mapagkukunan, at ginagawa ang gawain ng Diyos nang may pagkukusa at kagalakan. Roma 12:13 – “Tumulong kayo sa mga pangangailangan ng mga banal.”" }
+        },
+        B: { 
+            en: { title: "ADMINISTRATION", text: "You lead and communicate so people work harmoniously to reach goals. Romans 12:14 – “Bless those who persecute you.”" },
+            tl: { title: "PANGANGASIWA", text: "Namumuno at nakikipag-usap ka upang ang mga tao ay magtrabaho nang maayos para maabot ang mga layunin. Roma 12:14 – “Pagpalain ninyo ang mga umuusig sa inyo.”" }
+        },
+        C: { 
+            en: { title: "TEACHING", text: "You communicate the truth with obvious results. Romans 12:11 – “Keep spiritual fervor.”" },
+            tl: { title: "PAGTUTURO", text: "Ipinapahayag mo ang katotohanan na may malinaw na resulta. Roma 12:11 – “Panatilihin ang alab ng espiritu.”" }
+        },
+        D: { 
+            en: { title: "EXHORTATION", text: "You minister by giving comfort and encouragement. Romans 12:12 – “Joyful, patient and faithful.”" },
+            tl: { title: "PANGHIHIKAYAT", text: "Nagbibigay ka ng aliw at lakas ng loob sa iba. Roma 12:12 – “Magalak kayo sa pag-asa, magtiyaga sa kapighatian.”" }
+        },
+        E: { 
+            en: { title: "MERCY", text: "You feel compassion for those suffering. Romans 12:15-16 – “Rejoice with those who rejoice, mourn with mourners.”" },
+            tl: { title: "PAGKAWANGGAWA", text: "Nakadarama ka ng habag para sa mga naghihirap. Roma 12:15-16 – “Makigalak sa mga nagagalak; makiiyak sa mga umiiyak.”" }
+        },
+        F: { 
+            en: { title: "PROPHECY", text: "You discern and reveal motives and actions. Romans 12:9 – “Love must be sincere, hate evil.”" },
+            tl: { title: "PAGHAHAYAG", text: "Nauunawaan at inihahayag mo ang mga motibo at kilos. Roma 12:9 – “Maging tunay ang inyong pag-ibig; kapootan ang masama.”" }
+        },
+        G: { 
+            en: { title: "SERVING", text: "You identify and meet the needs of others. Romans 12:10 – “Be devoted, honor one another.”" },
+            tl: { title: "PAGLILINGKOD", text: "Natutukoy at natutugunan mo ang mga pangangailangan ng iba. Roma 12:10 – “Magmahalan kayo bilang magkakapatid.”" }
+        }
     };
 
-    const listEl = document.getElementById('questions-list');
-    questions.forEach(q => {
-        const row = document.createElement('div');
-        row.className = 'question-row';
-        row.innerHTML = `
-            <input type="checkbox" id="q${q.id}" data-cat="${q.cat}" style="transform:scale(1.3); margin-right:15px;">
-            <label style="flex:1; cursor:pointer;">${q.text}</label>
-            <span class="cat-badge">Level ${q.cat}</span>
-        `;
-        row.onclick = (e) => {
-            const cb = row.querySelector('input');
-            if (e.target.tagName !== 'INPUT') cb.checked = !cb.checked;
-            row.classList.toggle('selected', cb.checked);
-        };
-        listEl.appendChild(row);
-    });
+    function renderQuestions() {
+        const listEl = document.getElementById('questions-list');
+        listEl.innerHTML = '';
+        questions.forEach(q => {
+            const row = document.createElement('div');
+            row.className = 'question-row';
+            row.innerHTML = `
+                <input type="checkbox" id="q${q.id}" data-cat="${q.cat}" style="transform:scale(1.3); margin-right:15px;">
+                <label style="flex:1; cursor:pointer;">${q[currentLang]}</label>
+                <span class="cat-badge">Level ${q.cat}</span>
+            `;
+            row.onclick = (e) => {
+                const cb = row.querySelector('input');
+                if (e.target.tagName !== 'INPUT') cb.checked = !cb.checked;
+                row.classList.toggle('selected', cb.checked);
+            };
+            listEl.appendChild(row);
+        });
+    }
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'en' ? 'tl' : 'en';
+        document.getElementById('lang-toggle').innerText = currentLang === 'en' ? '🇵🇭 Tagalog' : '🇺🇸 English';
+        
+        // Update UI Text
+        const langData = uiText[currentLang];
+        document.getElementById('main-title').innerText = langData.title;
+        document.getElementById('sub-title').innerText = langData.sub;
+        document.getElementById('instruction-text').innerText = langData.instr;
+        document.getElementById('btn-discover').innerText = langData.discover;
+        document.getElementById('title-strengths').innerText = langData.strengths;
+        document.getElementById('title-appendix').innerText = langData.appendix;
+        document.getElementById('title-resources').innerText = langData.resources;
+        document.getElementById('btn-pdf').innerText = langData.pdf;
+        document.getElementById('btn-reset').innerText = langData.reset;
+
+        renderQuestions();
+    }
 
     function generateDocument() {
         const scores = {A:0, B:0, C:0, D:0, E:0, F:0, G:0};
@@ -167,10 +231,12 @@
         idContainer.innerHTML = appContainer.innerHTML = '';
 
         Object.keys(database).forEach(key => {
-            const gift = database[key];
-            const content = `<div class="gift-card"><span class="level-header">Level ${gift.level}. ${gift.title}</span>${gift.text}</div>`;
-            if (scores[key] >= 3) idContainer.innerHTML += content.replace('</span>', ` (Frequency Score: ${scores[key]})</span>`);
-            appContainer.innerHTML += `<div style="margin-bottom:15px"><strong>Level ${gift.level}. ${gift.title}:</strong> ${gift.text}</div>`;
+            const gift = database[key][currentLang];
+            const content = `<div class="gift-card"><span class="level-header">Level ${key}. ${gift.title}</span>${gift.text}</div>`;
+            if (scores[key] >= 3) {
+                idContainer.innerHTML += content.replace('</span>', ` (${uiText[currentLang].score}: ${scores[key]})</span>`);
+            }
+            appContainer.innerHTML += `<div style="margin-bottom:15px"><strong>Level ${key}. ${gift.title}:</strong> ${gift.text}</div>`;
         });
 
         document.getElementById('form-view').style.display = 'none';
@@ -180,8 +246,11 @@
 
     function downloadPDF() {
         const element = document.getElementById('printable-doc');
-        html2pdf().from(element).save('Spiritual_Gifts_Inventory_Report.pdf');
+        html2pdf().from(element).save(`Spiritual_Gifts_Report_${currentLang}.pdf`);
     }
+
+    // Initial load
+    renderQuestions();
 </script>
 </body>
 </html>
