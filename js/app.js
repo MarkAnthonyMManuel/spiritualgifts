@@ -305,3 +305,25 @@ function downloadPDF() {
         element.style.display = 'none';
         element.style.position = 'static';
         btn.innerHTML = originalText;
+        btn.disabled = false;
+        showToast('Error generating PDF. Please try again.');
+        console.error(err);
+    });
+}
+
+// Reset test
+function resetTest() {
+    if (confirm(currentLang === 'en' ? 'Are you sure you want to start over? Your selections will be cleared.' : 'Sigurado ka bang gusto mong magsimulang muli? Ang iyong mga pinili ay mabubura.')) {
+        currentScores = null;
+        isReportGenerated = false;
+        window.location.reload();
+    }
+}
+
+// Show toast notification
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
