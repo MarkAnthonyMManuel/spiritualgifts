@@ -6,214 +6,969 @@
     <title>Spiritual Gifts Inventory Report</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --primary: #000000; --accent: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1a1a1a; --border: #e2e8f0; }
-        
-        body { font-family: 'Times New Roman', serif; background-color: var(--bg); color: var(--text); line-height: 1.5; margin: 0; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: var(--card); padding: 50px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        
-        .no-print { position: fixed; top: 20px; right: 20px; z-index: 1000; display: flex; gap: 8px; }
-        .btn { font-family: sans-serif; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; border: 1px solid var(--border); background: white; }
-        .btn-primary { background: var(--accent); color: white; border: none; width: 100%; font-size: 1.1rem; padding: 15px; margin-top: 20px; }
-        
-        header { margin-bottom: 30px; }
-        h1 { font-size: 1.8rem; margin-bottom: 5px; }
-        
-        .question-row { font-family: sans-serif; display: flex; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
-        .question-row:hover { background-color: #f1f5f9; }
-        .question-row.selected { background-color: #eff6ff; font-weight: bold; }
-        
-        /* REPORT STYLING - Paragraph Form */
-        #report-output { display: none; }
-        .report-section { margin-top: 30px; }
-        .gift-entry { margin-bottom: 25px; text-align: justify; }
-        .gift-title { font-weight: bold; text-transform: uppercase; }
-        .selected-statement { margin-left: 20px; font-style: italic; color: #444; display: block; margin-top: 5px; }
-        .section-header { font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #000; margin: 40px 0 20px 0; padding-bottom: 5px; }
+        :root {
+            --primary: #1e293b;
+            --accent: #2563eb;
+            --accent-light: #3b82f6;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #334155;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-light: #94a3b8;
+            --border: #334155;
+            --primary: #f8fafc;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, #e2e8f0 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, var(--bg) 0%, #1e293b 100%);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light), var(--accent));
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            background: var(--card);
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            border: none;
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 18px;
+            margin-top: 30px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '→';
+            margin-left: 8px;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover::after {
+            transform: translateX(4px);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text-light);
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0 40px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        header .subtitle {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .progress-container {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .instruction {
+            text-align: center;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 8px;
+            border: 1px dashed var(--accent);
+        }
+
+        .questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .question-row {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--card);
+            position: relative;
+        }
+
+        .question-row:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+            box-shadow: var(--shadow);
+        }
+
+        .question-row.selected {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(37, 99, 235, 0.02));
+            border-color: var(--accent);
+            border-left-width: 4px;
+        }
+
+        .question-row input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            margin-right: 16px;
+            cursor: pointer;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+            pointer-events: none;
+        }
+
+        .question-row label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1.5;
+            padding-right: 10px;
+            pointer-events: none;
+        }
+
+        .cat-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            flex-shrink: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #report-output {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: var(--accent);
+            background: linear-gradient(135deg, var(--bg), rgba(37, 99, 235, 0.05));
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin: 40px 0 25px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.95rem;
+            border-left: 4px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '◆';
+            font-size: 0.8rem;
+        }
+
+        .gift-card {
+            margin-bottom: 20px;
+            padding: 24px;
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--accent);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease;
+        }
+
+        .gift-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .level-header {
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .score-badge {
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .gift-description {
+            color: var(--text-light);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .scripture-ref {
+            display: inline-block;
+            margin-top: 12px;
+            font-style: italic;
+            color: var(--accent);
+            font-weight: 600;
+            background: rgba(37, 99, 235, 0.05);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .video-section {
+            margin-top: 40px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .video-card {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .video-title {
+            font-weight: 700;
+            padding: 16px;
+            color: var(--primary);
+            font-size: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid var(--border);
+        }
+
+        .btn-full {
+            flex: 2;
+        }
+
+        .btn-half {
+            flex: 1;
+            background: var(--text-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 24px; }
+            header h1 { font-size: 1.8rem; }
+            .controls { top: 10px; right: 10px; padding: 8px; }
+            .btn { padding: 8px 14px; font-size: 0.85rem; }
+            .question-row { padding: 14px; }
+            .question-row label { font-size: 0.95rem; }
+            .action-bar { flex-direction: column; }
+            .video-grid { grid-template-columns: 1fr; }
+        }
 
         @media print {
-            .no-print, .btn-primary, .video-section, #form-view, .instructions { display: none !important; }
+            .no-print, .controls, .video-section, .btn-primary, .progress-container { display: none !important; }
             body { background: white; padding: 0; }
-            .container { box-shadow: none; border: none; width: 100%; padding: 0; }
-            #report-output { display: block !important; }
+            .container { box-shadow: none; border: none; max-width: 100%; padding: 20px; }
+            .gift-card { break-inside: avoid; page-break-inside: avoid; }
+            .section-title { background: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--primary);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
 <body>
 
-<div class="no-print">
-    <button class="btn" id="lang-toggle" onclick="toggleLanguage()">🇵🇭 Tagalog</button>
-</div>
-
-<div class="container" id="printable-doc">
-    <header>
-        <h1 id="main-title">My Spiritual Gifts</h1>
-    </header>
-
-    <div id="form-view">
-        <p id="sub-title" class="instructions">A method to help you discover your gifts. Check the items which best describe you.</p>
-        <div id="questions-list"></div>
-        <button class="btn btn-primary" id="btn-discover" onclick="generateDocument()">Generate My Report</button>
+    <div class="controls no-print">
+        <button class="btn" onclick="toggleLanguage()" id="lang-btn">
+            <span id="lang-flag">🇵🇭</span>
+            <span id="lang-text">Tagalog</span>
+        </button>
+        <button class="btn btn-secondary" onclick="toggleTheme()">
+            <span id="theme-icon">🌙</span>
+        </button>
     </div>
 
-    <div id="report-output">
-        <div id="identified-gifts-container"></div>
-        
-        <div class="section-header" id="title-appendix">Full Category Descriptions</div>
-        <div id="appendix-container"></div>
+    <div class="container" id="printable-doc">
+        <header>
+            <h1 id="main-title">Spiritual Gifts Inventory</h1>
+            <div class="subtitle" id="sub-title">A method to help you discover your gifts. Check the items which best describe you.</div>
+        </header>
+
+        <div id="form-view">
+            <div class="progress-container no-print">
+                <div class="progress-header">
+                    <span id="progress-text">Progress</span>
+                    <span id="progress-count">0/31 selected</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-bar"></div>
+                </div>
+            </div>
+
+            <div class="instruction" id="instruction-text">
+                Click anywhere on a row to select statements that describe you
+            </div>
+
+            <div class="questions-list" id="questions-list"></div>
+
+            <button class="btn btn-primary" id="btn-discover" onclick="generateDocument()">
+                Discover My Spiritual Gifts
+            </button>
+        </div>
+
+        <div id="report-output">
+            <div class="section-title" id="title-strengths">Primary Ministry Strengths</div>
+            <div id="identified-gifts-container"></div>
+
+            <div class="section-title" id="title-appendix" style="background: linear-gradient(135deg, #f1f5f9, transparent); color: #475569;">
+                Complete Gift Descriptions
+            </div>
+            <div id="appendix-container"></div>
+
+            <div class="video-section no-print">
+                <div class="section-title" id="title-resources">Recommended Growth Resources</div>
+                <div class="video-grid">
+                    <div class="video-card">
+                        <div class="video-title">7 Habits of Spirit-Filled Believers</div>
+                        <div class="video-wrapper">
+                            <iframe src="https://www.youtube.com/embed/GT0fro5ANcM" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-title">Fruit of the Spirit (Galatians 5:22-23)</div>
+                        <div class="video-wrapper">
+                            <iframe src="https://www.youtube.com/embed/qG9SbXG9BaY" allowfullscreen loading="lazy"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-bar no-print">
+                <button class="btn btn-primary btn-full" id="btn-pdf" onclick="downloadPDF()">
+                    📄 Download PDF Report
+                </button>
+                <button class="btn btn-primary btn-half" id="btn-reset" onclick="resetTest()">
+                    🔄 Start Over
+                </button>
+            </div>
+        </div>
     </div>
-</div>
 
-<script>
-    let currentLang = 'en';
+    <div class="toast" id="toast"></div>
 
-    const uiText = {
-        en: { title: "My Spiritual Gifts", sub: "A method to help you discover your gifts. Check the items which best describe you.", appendix: "Full Category Descriptions", pdf: "Download PDF", score: "Score" },
-        tl: { title: "Aking mga Espirituwal na Kaloob", sub: "Isang pamamaraan upang matulungan kang matuklasan ang iyong mga kaloob. Lagyan ng tsek ang mga aytem na pinakamahusay na naglalarawan sa iyo.", appendix: "Buong Deskripsyon ng mga Kategorya", pdf: "I-download ang PDF", score: "Iskor" }
-    };
+    <script>
+        // State Management
+        let currentLang = 'en';
+        let selectedCount = 0;
+        let currentScores = null; // Store scores for language switching in results
+        let isReportGenerated = false;
 
-    const questions = [
-        { id: 1, cat: "G", en: "I prefer ministering by myself rather than in a group.", tl: "Mas gusto kong maglingkod nang mag-isa kaysa sa isang grupo." },
-        { id: 2, cat: "F", en: "People often say I am impulsive and direct.", tl: "Madalas sabihin ng mga tao na ako ay pabigla-bigla at prangka." },
-        { id: 3, cat: "A", en: "My financial resources are above average.", tl: "Ang aking pinansyal na mapagkukunan ay higit sa karaniwan." },
-        { id: 4, cat: "D", en: "I like to counsel people on a short-term basis.", tl: "Gusto kong magpayo sa mga tao sa maikling panahon." },
-        { id: 5, cat: "G", en: "I am a task-oriented person.", tl: "Ako ay isang taong nakatuon sa gawain." },
-        { id: 6, cat: "B", en: "I love directing other people's work.", tl: "Mahal ko ang pagdidirekta sa trabaho ng ibang tao." },
-        { id: 7, cat: "E", en: "It's natural for me to show kindness to people.", tl: "Likas sa akin ang magpakita ng kabaitan sa mga tao." },
-        { id: 8, cat: "C", en: "People learn easily from me.", tl: "Madaling matuto ang mga tao mula sa akin." },
-        { id: 9, cat: "F", en: "I can be very persuasive.", tl: "Maaari akong maging napaka-mapanghikayat." },
-        { id: 10, cat: "A", en: "More than 10 percent of my income goes for Christian causes.", tl: "Higit sa 10 porsiyento ng aking kita ay napupunta sa mga gawaing Kristiyano." },
-        { id: 11, cat: "D", en: "People often follow my advice.", tl: "Madalas sundin ng mga tao ang aking payo." },
-        { id: 12, cat: "C", en: "I normally use several books in lesson preparation.", tl: "Karaniwan akong gumagamit ng ilang mga libro sa paghahanda ng aralin." },
-        { id: 13, cat: "B", en: "I like to recruit and lead people.", tl: "Gusto kong mag-recruit at mamuno ng mga tao." },
-        { id: 14, cat: "E", en: "One-on-one relationships are important to me.", tl: "Ang one-on-one na relasyon ay mahalaga sa akin." },
-        { id: 15, cat: "G", en: "I possess a variety of talents and abilities.", tl: "Nagtataglay ako ng iba't ibang mga talento at kakayahan." },
-        { id: 16, cat: "F", en: "I want to measure everything by God's Word.", tl: "Gusto kong sukatin ang lahat sa pamamagitan ng Salita ng Diyos." },
-        { id: 17, cat: "A", en: "Material possessions don't mean much to me.", tl: "Ang mga materyal na pag-aari ay hindi gaanong mahalaga sa akin." },
-        { id: 18, cat: "D", en: "Discouraged people are encouraged by my words.", tl: "Ang mga taong pinanghihinaan ng loob ay nabibigyang-lakas ng aking mga salita." },
-        { id: 19, cat: "C", en: "Being accurate and truthful are important to me.", tl: "Ang pagiging tumpak at tapat ay mahalaga sa akin." },
-        { id: 20, cat: "G", en: "I love the challenge of accomplishing an organization goal.", tl: "Gusto ko ang hamon ng pagkamit ng isang layunin ng organisasyon." },
-        { id: 21, cat: "D", en: "Other people's spiritual welfare genuinely concerns me.", tl: "Ang espirituwal na kapakanan ng ibang tao ay tunay na mahalaga sa akin." },
-        { id: 22, cat: "F", en: "I usually make quick decisions.", tl: "Karaniwan akong gumagawa ng mabilis na desisyon." },
-        { id: 23, cat: "E", en: "I look for ways to help the unfortunate and downtrodden.", tl: "Naghahanap ako ng mga paraan upang matulungan ang mga kapus-palad." },
-        { id: 24, cat: "C", en: "Criticism doesn't bother me.", tl: "Hindi ako naaabala ng mga kritismo." },
-        { id: 25, cat: "G", en: "I often volunteer my time and talents to worthwhile causes.", tl: "Madalas kong ibigay ang aking oras at talento para sa mga makabuluhang layunin." },
-        { id: 26, cat: "B", en: "I am usually self-confident.", tl: "Karaniwan akong may tiwala sa sarili." },
-        { id: 27, cat: "E", en: "I don't expect repayment for favors I do for others.", tl: "Hindi ako umaasa ng kabayaran para sa mga pabor na ginagawa ko sa iba." },
-        { id: 28, cat: "B", en: "I enjoy being responsible for the success of the group.", tl: "Nasisiyahan akong maging responsable para sa tagumpay ng grupo." },
-        { id: 29, cat: "F", en: "When a question about truth comes up, I am normally right.", tl: "Kapag may lumabas na tanong tungkol sa katotohanan, karaniwan akong tama." },
-        { id: 30, cat: "B", en: "Deadlines challenge me, and I usually meet them on time.", tl: "Hinahamon ako ng mga deadline, at karaniwan ko itong natatapos sa oras." },
-        { id: 31, cat: "D", en: "People in pain are comforted by my presence.", tl: "Ang mga taong nasasaktan ay naaaliw sa aking presensya." }
-    ];
-
-    const database = {
-        A: { 
-            en: { title: "GIVING", text: "You contribute material resources, and do God’s work with liberality and cheerfulness. You contribute sacrificially, motivate others, and don’t shun pressure or publicity. Romans 12:13 – “Share with God’s people.”" },
-            tl: { title: "PAGBIBIGAY", text: "Nag-aambag ka ng mga materyal na mapagkukunan, at ginagawa ang gawain ng Diyos nang may pagkukusa at kagalakan. Nag-aambag ka nang may pagsasakripisyo, nag-uudyok sa iba, at hindi umiiwas sa pressure o publisidad. Roma 12:13 – “Tumulong kayo sa mga pangangailangan ng mga banal.”" }
-        },
-        B: { 
-            en: { title: "ADMINISTRATION", text: "You lead and communicate in such a way that people work harmoniously to reach goals for God’s purpose. You enjoy being a leader and can endure adverse reactions to get the job done. You enjoy seeing tasks complete; are able to set guidelines, schedules, and policies; and can delegate to get the work done. Romans 12:14 – “Bless those who persecute you.”" },
-            tl: { title: "PANGANGASIWA", text: "Namumuno at nakikipag-usap ka upang ang mga tao ay magtrabaho nang maayos para maabot ang mga layunin para sa layunin ng Diyos. Nasisiyahan kang maging pinuno at kayang tiisin ang mga negatibong reaksyon para matapos ang trabaho. Roma 12:14 – “Pagpalain ninyo ang mga umuusig sa inyo.”" }
-        },
-        C: { 
-            en: { title: "TEACHING", text: "You communicate the truth with obvious results. You believe your gift is foundational and work systematically and with accuracy. Romans 12:11 – “Keep spiritual fervor.”" },
-            tl: { title: "PAGTUTURO", text: "Ipinapahayag mo ang katotohanan na may malinaw na resulta. Naniniwala ka na ang iyong kaloob ay pundasyon at gumagawa nang sistematiko at may kawastuhan. Roma 12:11 – “Panatilihin ang alab ng espiritu.”" }
-        },
-        D: { 
-            en: { title: "EXHORTATION", text: "You minister by giving comfort and encouragement. You are able to help people through problems and discourage them from giving up. Romans 12:12 – “Joyful, patient and faithful.”" },
-            tl: { title: "PANGHIHIKAYAT", text: "Nagbibigay ka ng aliw at lakas ng loob. Nakatutulong ka sa mga tao sa kanilang mga problema at hinihimok silang huwag sumuko. Roma 12:12 – “Magalak kayo sa pag-asa, magtiyaga sa kapighatian.”" }
-        },
-        E: { 
-            en: { title: "MERCY", text: "You feel compassion for those suffering. You are sensitive to the feelings and needs of others. Romans 12:15-16 – “Rejoice with those who rejoice, mourn with mourners.”" },
-            tl: { title: "PAGKAWANGGAWA", text: "Nakadarama ka ng habag para sa mga naghihirap. Sensitibo ka sa damdamin at pangangailangan ng iba. Roma 12:15-16 – “Makigalak sa mga nagagalak; makiiyak sa mga umiiyak.”" }
-        },
-        F: { 
-            en: { title: "PROPHECY", text: "You discern and reveal motives and actions. You strongly advocate for God’s truth and character. Romans 12:9 – “Love must be sincere, hate evil.”" },
-            tl: { title: "PAGHAHAYAG", text: "Nauunawaan at inihahayag mo ang mga motibo at kilos. Mariin mong itinataguyod ang katotohanan at katangian ng Diyos. Roma 12:9 – “Maging tunay ang inyong pag-ibig; kapootan ang masama.”" }
-        },
-        G: { 
-            en: { title: "SERVING", text: "You identify and meet the needs of others. You are task-oriented and enjoy doing things for people in practical ways. Romans 12:10 – “Be devoted, honor one another.”" },
-            tl: { title: "PAGLILINGKOD", text: "Natutukoy at natutugunan mo ang mga pangangailangan ng iba. Nakatuon ka sa mga gawain at nasisiyahan sa pagtulong sa mga tao sa praktikal na paraan. Roma 12:10 – “Magmahalan kayo bilang magkakapatid.”" }
-        }
-    };
-
-    function renderQuestions() {
-        const listEl = document.getElementById('questions-list');
-        listEl.innerHTML = '';
-        questions.forEach(q => {
-            const row = document.createElement('div');
-            row.className = 'question-row';
-            row.innerHTML = `
-                <input type="checkbox" id="q${q.id}" data-cat="${q.cat}" style="margin-right:15px;">
-                <label style="flex:1; cursor:pointer;">${q[currentLang]}</label>
-            `;
-            row.onclick = (e) => {
-                const cb = row.querySelector('input');
-                if (e.target.tagName !== 'INPUT') cb.checked = !cb.checked;
-                row.classList.toggle('selected', cb.checked);
-            };
-            listEl.appendChild(row);
-        });
-    }
-
-    function toggleLanguage() {
-        currentLang = currentLang === 'en' ? 'tl' : 'en';
-        document.getElementById('lang-toggle').innerText = currentLang === 'en' ? '🇵🇭 Tagalog' : '🇺🇸 English';
-        const langData = uiText[currentLang];
-        document.getElementById('main-title').innerText = langData.title;
-        document.getElementById('sub-title').innerText = langData.sub;
-        document.getElementById('title-appendix').innerText = langData.appendix;
-        document.getElementById('btn-discover').innerText = currentLang === 'en' ? "Generate My Report" : "Gawin ang aking Report";
-        renderQuestions();
-    }
-
-    function generateDocument() {
-        const idContainer = document.getElementById('identified-gifts-container');
-        const appContainer = document.getElementById('appendix-container');
-        idContainer.innerHTML = appContainer.innerHTML = '';
-
-        const selectedByCat = {};
-        document.querySelectorAll('input:checked').forEach(i => {
-            const cat = i.dataset.cat;
-            if(!selectedByCat[cat]) selectedByCat[cat] = [];
-            selectedByCat[cat].push(questions.find(q => q.id == i.id.substring(1))[currentLang]);
-        });
-
-        Object.keys(database).forEach(key => {
-            const gift = database[key][currentLang];
-            // 1. Identified Strengths Section (Only if selected)
-            if (selectedByCat[key]) {
-                let html = `<div class="gift-entry">
-                    <span class="gift-title">${key}. ${gift.title}</span> ${gift.text}
-                    <div style="margin-top:10px;">`;
-                selectedByCat[key].forEach(statement => {
-                    html += `<span class="selected-statement">• ${statement}</span>`;
-                });
-                html += `</div></div>`;
-                idContainer.innerHTML += html;
+        // Data
+        const uiText = {
+            en: {
+                title: "Spiritual Gifts Inventory",
+                sub: "A method to help you discover your gifts. Check the items which best describe you.",
+                instr: "Click anywhere on a row to select statements that describe you",
+                discover: "Discover My Spiritual Gifts",
+                strengths: "Primary Ministry Strengths",
+                appendix: "Complete Gift Descriptions",
+                resources: "Recommended Growth Resources",
+                pdf: "Download PDF Report",
+                reset: "Start Over",
+                score: "Score",
+                progress: "Progress",
+                selected: "selected",
+                emptyTitle: "No Primary Gifts Identified Yet",
+                emptyDesc: "Select at least 3 statements in a category to identify a primary gift.",
+                langName: "Tagalog"
+            },
+            tl: {
+                title: "Listahan ng mga Espirituwal na Kaloob",
+                sub: "Isang paraan upang matulungan kang matuklasan ang iyong mga talento. Lagyan ng tsek ang mga bagay na pinakamahusay na naglalarawan sa iyo.",
+                instr: "I-click ang kahit saan sa hanay upang piliin ang mga pahayag na naglalarawan sa iyo",
+                discover: "Tuklasin ang Aking mga Espirituwal na Kaloob",
+                strengths: "Mga Pangunahing Kalakasan sa Ministeryo",
+                appendix: "Buong Deskripsyon ng mga Kaloob",
+                resources: "Inirerekomendang Mapagkukunan para sa Paglago",
+                pdf: "I-download ang PDF na Ulat",
+                reset: "Magsimulang Muli",
+                score: "Iskor",
+                progress: "Progreso",
+                selected: "napili",
+                emptyTitle: "Wala Pang Natukoy na Pangunahing Kaloob",
+                emptyDesc: "Pumili ng hindi bababa sa 3 pahayag sa isang kategorya upang matukoy ang isang pangunahing kaloob.",
+                langName: "English"
             }
-            // 2. Appendix Section (Always included)
-            appContainer.innerHTML += `<div class="gift-entry"><span class="gift-title">${key}. ${gift.title}</span> ${gift.text}</div>`;
+        };
+
+        const questions = [
+            { id: 1, cat: "G", en: "I prefer ministering by myself rather than in a group.", tl: "Mas gusto kong maglingkod nang mag-isa kaysa sa isang grupo." },
+            { id: 2, cat: "F", en: "People often say I am impulsive and direct.", tl: "Madalas sabihin ng mga tao na ako ay pabigla-bigla at prangka." },
+            { id: 3, cat: "A", en: "My financial resources are above average.", tl: "Ang aking pinansyal na mapagkukunan ay higit sa karaniwan." },
+            { id: 4, cat: "D", en: "I like to counsel people on a short-term basis.", tl: "Gusto kong magpayo sa mga tao sa maikling panahon." },
+            { id: 5, cat: "G", en: "I am a task-oriented person.", tl: "Ako ay isang taong nakatuon sa gawain." },
+            { id: 6, cat: "B", en: "I love directing other people's work.", tl: "Mahal ko ang pagdidirekta sa trabaho ng ibang tao." },
+            { id: 7, cat: "E", en: "It's natural for me to show kindness to people.", tl: "Likas sa akin ang magpakita ng kabaitan sa mga tao." },
+            { id: 8, cat: "C", en: "People learn easily from me.", tl: "Madaling matuto ang mga tao mula sa akin." },
+            { id: 9, cat: "F", en: "I can be very persuasive.", tl: "Maaari akong maging napaka-mapanghikayat." },
+            { id: 10, cat: "A", en: "More than 10 percent of my income goes for Christian causes.", tl: "Higit sa 10 porsiyento ng aking kita ay napupunta sa mga gawaing Kristiyano." },
+            { id: 11, cat: "D", en: "People often follow my advice.", tl: "Madalas sundin ng mga tao ang aking payo." },
+            { id: 12, cat: "C", en: "I normally use several books in lesson preparation.", tl: "Karaniwan akong gumagamit ng ilang mga libro sa paghahanda ng aralin." },
+            { id: 13, cat: "B", en: "I like to recruit and lead people.", tl: "Gusto kong mag-recruit at mamuno ng mga tao." },
+            { id: 14, cat: "E", en: "One-on-one relationships are important to me.", tl: "Ang one-on-one na relasyon ay mahalaga sa akin." },
+            { id: 15, cat: "G", en: "I possess a variety of talents and abilities.", tl: "Nagtataglay ako ng iba't ibang mga talento at kakayahan." },
+            { id: 16, cat: "F", en: "I want to measure everything by God's Word.", tl: "Gusto kong sukatin ang lahat sa pamamagitan ng Salita ng Diyos." },
+            { id: 17, cat: "A", en: "Material possessions don't mean much to me.", tl: "Ang mga materyal na pag-aari ay hindi gaanong mahalaga sa akin." },
+            { id: 18, cat: "D", en: "Discouraged people are encouraged by my words.", tl: "Ang mga taong pinanghihinaan ng loob ay nabibigyang-lakas ng aking mga salita." },
+            { id: 19, cat: "C", en: "Being accurate and truthful are important to me.", tl: "Ang pagiging tumpak at tapat ay mahalaga sa akin." },
+            { id: 20, cat: "G", en: "I love the challenge of accomplishing an organization goal.", tl: "Gusto ko ang hamon ng pagkamit ng isang layunin ng organisasyon." },
+            { id: 21, cat: "D", en: "Other people's spiritual welfare genuinely concerns me.", tl: "Ang espirituwal na kapakanan ng ibang tao ay tunay na mahalaga sa akin." },
+            { id: 22, cat: "F", en: "I usually make quick decisions.", tl: "Karaniwan akong gumagawa ng mabilis na desisyon." },
+            { id: 23, cat: "E", en: "I look for ways to help the unfortunate and downtrodden.", tl: "Naghahanap ako ng mga paraan upang matulungan ang mga kapus-palad." },
+            { id: 24, cat: "C", en: "Criticism doesn't bother me.", tl: "Hindi ako naaabala ng mga kritismo." },
+            { id: 25, cat: "G", en: "I often volunteer my time and talents to worthwhile causes.", tl: "Madalas kong ibigay ang aking oras at talento para sa mga makabuluhang layunin." },
+            { id: 26, cat: "B", en: "I am usually self-confident.", tl: "Karaniwan akong may tiwala sa sarili." },
+            { id: 27, cat: "E", en: "I don't expect repayment for favors I do for others.", tl: "Hindi ako umaasa ng kabayaran para sa mga pabor na ginagawa ko sa iba." },
+            { id: 28, cat: "B", en: "I enjoy being responsible for the success of the group.", tl: "Nasisiyahan akong maging responsable para sa tagumpay ng grupo." },
+            { id: 29, cat: "F", en: "When a question about truth comes up, I am normally right.", tl: "Kapag may lumabas na tanong tungkol sa katotohanan, karaniwan akong tama." },
+            { id: 30, cat: "B", en: "Deadlines challenge me, and I usually meet them on time.", tl: "Hinahamon ako ng mga deadline, at karaniwan ko itong natatapos sa oras." },
+            { id: 31, cat: "D", en: "People in pain are comforted by my presence.", tl: "Ang mga taong nasasaktan ay naaaliw sa aking presensya." }
+        ];
+
+        const database = {
+            A: {
+                en: { 
+                    title: "Giving", 
+                    text: "You contribute material resources with liberality and cheerfulness, often sacrificially. You motivate others to give and don't shun pressure or publicity in your generosity.",
+                    scripture: "Romans 12:13 – 'Share with God's people who are in need. Practice hospitality.'"
+                },
+                tl: { 
+                    title: "Pagbibigay", 
+                    text: "Nag-aambag ka ng mga materyal na mapagkukunan nang may pagkukusa at kagalakan, madalas na sakripisyal. Hinihikayat mo ang iba na magbigay at hindi umaatras sa pressure o publisidad sa iyong kagandahang-loob.",
+                    scripture: "Roma 12:13 – 'Tumulong kayo sa mga pangangailangan ng mga banal. Magsanay kayo sa pagkamapagpatuloy.'"
+                }
+            },
+            B: {
+                en: { 
+                    title: "Administration", 
+                    text: "You lead and communicate so people work harmoniously to reach goals. You enjoy leadership, endure adverse reactions, and excel at setting guidelines, schedules, and policies while delegating effectively.",
+                    scripture: "Romans 12:14 – 'Bless those who persecute you; bless and do not curse.'"
+                },
+                tl: { 
+                    title: "Pangangasiwa", 
+                    text: "Namumuno at nakikipag-usap ka upang ang mga tao ay magtrabaho nang maayos para maabot ang mga layunin. Nasisiyahan ka sa pamumuno, tiis ang mga masasamang reaksyon, at mahusay sa pagtatakda ng mga alituntunin, iskedyul, at patakaran habang epektibong nagdedelega.",
+                    scripture: "Roma 12:14 – 'Pagpalain ninyo ang mga umuusig sa inyo; pagpalain at huwag sumpain.'"
+                }
+            },
+            C: {
+                en: { 
+                    title: "Teaching", 
+                    text: "You communicate truth with clarity and obvious results. You believe your gift is foundational, work systematically, and maintain accuracy in all you present.",
+                    scripture: "Romans 12:11 – 'Never be lacking in zeal, but keep your spiritual fervor, serving the Lord.'"
+                },
+                tl: { 
+                    title: "Pagtuturo", 
+                    text: "Ipinapahayag mo ang katotohanan nang may kaliwanagan at malinaw na resulta. Naniniwala ka na ang iyong kaloob ay pundamental, nagtatrabaho nang may sistema, at pinapanatili ang katumpakan sa lahat ng iyong inihahain.",
+                    scripture: "Roma 12:11 – 'Huwag magkulang sa kasigasigan; magningas sa espiritu; maglingkod sa Panginoon.'"
+                }
+            },
+            D: {
+                en: { 
+                    title: "Exhortation", 
+                    text: "You minister by giving comfort, consolation, and encouragement so people feel helped and healed. You view problems as challenges and are drawn to those seeking spiritual growth.",
+                    scripture: "Romans 12:12 – 'Be joyful in hope, patient in affliction, faithful in prayer.'"
+                },
+                tl: { 
+                    title: "Panghihikayat", 
+                    text: "Naglilingkod ka sa pamamagitan ng pagbibigay ng aliwan, konsolasyon, at pag-asa upang ang mga tao ay makaramdam ng tulong at pagaling. Tinitingnan mo ang mga problema bilang mga hamon at nahihikayat sa mga naghahanap ng espirituwal na paglago.",
+                    scripture: "Roma 12:12 – 'Magalak kayo sa pag-asa, magtiyaga sa kapighatian, manatiling dalangin.'"
+                }
+            },
+            E: {
+                en: { 
+                    title: "Mercy", 
+                    text: "You feel deep compassion for those suffering and perform deeds to reflect God's love. Naturally drawn to hurting people, you are sensitive, giving, loving, and desire healing for others.",
+                    scripture: "Romans 12:15-16 – 'Rejoice with those who rejoice; mourn with those who mourn. Live in harmony with one another.'"
+                },
+                tl: { 
+                    title: "Pagkawanggawa", 
+                    text: "Nakadarama ka ng malalim na habag para sa mga naghihirap at gumagawa ng mga gawaing nagpapakita ng pag-ibig ng Diyos. Likas na nahihikayat sa mga nasasaktang tao, ikaw ay maaalahanin, mapagbigay, mapagmahal, at hangad ang pagaling para sa iba.",
+                    scripture: "Roma 12:15-16 – 'Makigalak sa mga nagagalak; makiiyak sa mga umiiyak. Magkasundo kayo.'"
+                }
+            },
+            F: {
+                en: { 
+                    title: "Prophecy", 
+                    text: "Your goal is to bring people face to face with God. You discern and reveal motives and actions, have strong convictions, and are impulsive, direct, and persuasive.",
+                    scripture: "Romans 12:9 – 'Love must be sincere. Hate what is evil; cling to what is good.'"
+                },
+                tl: { 
+                    title: "Pagpapahayag", 
+                    text: "Ang iyong layunin ay dalhin ang mga tao sa harap ng Diyos. Nauunawaan at inihahayag mo ang mga motibo at kilos, may malalakas na paninindigan, at ikaw ay pabigla-bigla, prangka, at mapanghikayat.",
+                    scripture: "Roma 12:9 – 'Maging tunay ang inyong pag-ibig; kapootan ang masama; kumapit sa mabuti.'"
+                }
+            },
+            G: {
+                en: { 
+                    title: "Serving", 
+                    text: "You identify and meet the needs of others using personal resources. You see needs and enjoy responding, work best short-term and alone, and possess endurance with a tendency to do too much.",
+                    scripture: "Romans 12:10 – 'Be devoted to one another in love. Honor one another above yourselves.'"
+                },
+                tl: { 
+                    title: "Paglilingkod", 
+                    text: "Natutukoy at natutugunan mo ang mga pangangailangan ng iba gamit ang personal na mapagkukunan. Nakikita mo ang mga pangangailangan at nasisiyahan sa pagtugon, nagtatrabaho nang maayos sa maikling panahon at mag-isa, at nagtataglay ng tibay ng loob na may tendensyang magtrabaho nang labis.",
+                    scripture: "Roma 12:10 – 'Magmahalan kayo bilang magkakapatid. Magbigay ng karangalan sa isa't isa.'"
+                }
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderQuestions();
+            updateProgress();
         });
 
-        document.getElementById('form-view').style.display = 'none';
-        document.getElementById('report-output').style.display = 'block';
-        
-        // Final Action: Trigger PDF
-        downloadPDF();
-    }
+        function getSavedSelections() {
+            // Get currently checked IDs before re-rendering
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+            return Array.from(checked).map(cb => parseInt(cb.id.replace('q', '')));
+        }
 
-    function downloadPDF() {
-        const element = document.getElementById('printable-doc');
-        const opt = {
-            margin: 0.75,
-            filename: `Spiritual_Gifts_${currentLang}.pdf`,
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        html2pdf().set(opt).from(element).save();
-    }
+        function renderQuestions() {
+            const listEl = document.getElementById('questions-list');
+            
+            // Save current selections before clearing
+            const savedSelections = getSavedSelections();
+            
+            listEl.innerHTML = '';
+            
+            questions.forEach((q, index) => {
+                const row = document.createElement('div');
+                const isSelected = savedSelections.includes(q.id);
+                
+                row.className = `question-row ${isSelected ? 'selected' : ''}`;
+                row.dataset.id = q.id;
+                row.innerHTML = `
+                    <input type="checkbox" id="q${q.id}" data-cat="${q.cat}" ${isSelected ? 'checked' : ''}>
+                    <label for="q${q.id}">${q[currentLang]}</label>
+                    <span class="cat-badge">${q.cat}</span>
+                `;
+                
+                // Click anywhere on row toggles checkbox
+                row.addEventListener('click', (e) => {
+                    const cb = row.querySelector('input[type="checkbox"]');
+                    // Toggle checkbox state
+                    cb.checked = !cb.checked;
+                    
+                    // Update visual state
+                    row.classList.toggle('selected', cb.checked);
+                    
+                    // Update progress
+                    updateProgress();
+                });
+                
+                // Prevent double-triggering when clicking directly on checkbox
+                row.querySelector('input[type="checkbox"]').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    row.classList.toggle('selected', e.target.checked);
+                    updateProgress();
+                });
+                
+                listEl.appendChild(row);
+            });
+            
+            // Restore progress count
+            updateProgress();
+        }
 
-    renderQuestions();
-</script>
+        function updateProgress() {
+            const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+            selectedCount = checked.length;
+            const total = questions.length;
+            const percentage = (selectedCount / total) * 100;
+            
+            document.getElementById('progress-count').textContent = 
+                `${selectedCount}/${total} ${uiText[currentLang].selected}`;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            
+            if (selectedCount >= 10) {
+                document.getElementById('progress-bar').style.background = 
+                    'linear-gradient(90deg, var(--success), #34d399)';
+            } else {
+                document.getElementById('progress-bar').style.background = 
+                    'linear-gradient(90deg, var(--accent), var(--accent-light))';
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'tl' : 'en';
+            const langData = uiText[currentLang];
+            
+            // Update button
+            document.getElementById('lang-flag').textContent = currentLang === 'en' ? '🇵🇭' : '🇺🇸';
+            document.getElementById('lang-text').textContent = langData.langName;
+            
+            // Update all text elements
+            document.getElementById('main-title').textContent = langData.title;
+            document.getElementById('sub-title').textContent = langData.sub;
+            document.getElementById('instruction-text').textContent = langData.instr;
+            document.getElementById('btn-discover').textContent = langData.discover;
+            document.getElementById('progress-text').textContent = langData.progress;
+            
+            // Re-render questions with saved selections
+            renderQuestions();
+            
+            // If report is showing, re-render it in new language with saved scores
+            if (isReportGenerated && currentScores) {
+                renderReport();
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.body.dataset.theme === 'dark';
+            document.body.dataset.theme = isDark ? 'light' : 'dark';
+            document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.dataset.theme = 'dark';
+            document.getElementById('theme-icon').textContent = '☀️';
+        }
+
+        function generateDocument() {
+            if (selectedCount === 0) {
+                showToast(currentLang === 'en' ? 'Please select at least one statement first' : 'Mangyaring pumili muna ng hindi bababa sa isang pahayag');
+                return;
+            }
+
+            // Calculate and store scores
+            currentScores = {A:0, B:0, C:0, D:0, E:0, F:0, G:0};
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(i => {
+                currentScores[i.dataset.cat]++;
+            });
+            
+            isReportGenerated = true;
+            renderReport();
+            
+            // Transition to report view
+            document.getElementById('form-view').style.display = 'none';
+            document.getElementById('report-output').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderReport() {
+            const idContainer = document.getElementById('identified-gifts-container');
+            const appContainer = document.getElementById('appendix-container');
+            idContainer.innerHTML = '';
+            appContainer.innerHTML = '';
+
+            const langData = uiText[currentLang];
+            let hasPrimaryGifts = false;
+
+            const sortedGifts = Object.keys(database).sort((a, b) => currentScores[b] - currentScores[a]);
+
+            sortedGifts.forEach(key => {
+                const gift = database[key][currentLang];
+                const score = currentScores[key];
+                
+                if (score >= 3) {
+                    hasPrimaryGifts = true;
+                    idContainer.innerHTML += `
+                        <div class="gift-card">
+                            <span class="level-header">
+                                ${key}. ${gift.title}
+                                <span class="score-badge">${langData.score}: ${score}</span>
+                            </span>
+                            <div class="gift-description">${gift.text}</div>
+                            <div class="scripture-ref">${gift.scripture}</div>
+                        </div>
+                    `;
+                }
+
+                appContainer.innerHTML += `
+                    <div class="gift-card" style="border-left-color: ${score > 0 ? 'var(--accent)' : 'var(--border)'}; opacity: ${score > 0 ? '1' : '0.7'};">
+                        <span class="level-header">
+                            ${key}. ${gift.title}
+                            ${score > 0 ? `<span class="score-badge">${langData.score}: ${score}</span>` : ''}
+                        </span>
+                        <div class="gift-description">${gift.text}</div>
+                        <div class="scripture-ref">${gift.scripture}</div>
+                    </div>
+                `;
+            });
+
+            if (!hasPrimaryGifts) {
+                idContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎯</div>
+                        <h3>${langData.emptyTitle}</h3>
+                        <p>${langData.emptyDesc}</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('title-strengths').textContent = langData.strengths;
+            document.getElementById('title-appendix').textContent = langData.appendix;
+            document.getElementById('title-resources').textContent = langData.resources;
+            document.getElementById('btn-pdf').textContent = `📄 ${langData.pdf}`;
+            document.getElementById('btn-reset').textContent = `🔄 ${langData.reset}`;
+        }
+
+        function downloadPDF() {
+            const btn = document.getElementById('btn-pdf');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading"></span> Generating...';
+            btn.disabled = true;
+
+            const element = document.getElementById('printable-doc');
+            const opt = {
+                margin: [10, 10],
+                filename: `Spiritual_Gifts_Report_${currentLang}_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showToast(currentLang === 'en' ? 'PDF downloaded successfully!' : 'Matagumpay na na-download ang PDF!');
+            }).catch(err => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showToast('Error generating PDF. Please try again.');
+            });
+        }
+
+        function resetTest() {
+            if (confirm(currentLang === 'en' ? 'Are you sure you want to start over? Your selections will be cleared.' : 'Sigurado ka bang gusto mong magsimulang muli? Ang iyong mga pinili ay mabubura.')) {
+                currentScores = null;
+                isReportGenerated = false;
+                window.location.reload();
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    </script>
 </body>
 </html>
