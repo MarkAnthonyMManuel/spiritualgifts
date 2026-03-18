@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spiritual Gifts Assessment Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #2563eb;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #334155;
+            --border: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --border: #334155;
+            --primary: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .no-print-tools {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            transition: 0.2s;
+        }
+
+        .btn-primary { background: var(--accent); color: white; border: none; }
+        .btn-theme { background: var(--card); color: var(--text); }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 25px;
+            margin-bottom: 35px;
+        }
+
+        h1 { margin: 0; color: var(--primary); font-size: 2.2rem; letter-spacing: -0.025em; }
+        .doc-meta { font-size: 1rem; color: #64748b; margin-top: 8px; font-weight: 500; }
+
+        .question-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .question-text { flex: 1; padding-right: 15px; font-size: 1rem; }
+        .cat-badge { font-size: 0.75rem; font-weight: 800; background: var(--bg); padding: 4px 8px; border-radius: 6px; color: var(--accent); border: 1px solid var(--border); }
+
+        #report-output { display: none; }
+        
+        .section-title {
+            color: var(--accent);
+            background: var(--bg);
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 40px 0 20px;
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .gift-card {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--accent);
+        }
+
+        .gift-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .level-indicator {
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .score-pill {
+            background: var(--accent);
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .appendix-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .appendix-label {
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        @media print {
+            .no-print-tools, .btn-generate { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="no-print-tools">
+    <button class="btn btn-theme" onclick="toggleTheme()">🌓 Toggle Mode</button>
+</div>
+
+<div class="container" id="printable-doc">
+    <header>
+        <h1>Spiritual Gifts Inventory</h1>
+        <div class="doc-meta">A method to help you discover your gifts. Check the items which best describe you.</div>
+    </header>
+
+    <div id="form-view">
+        <div id="questions-list"></div>
+        <button class="btn btn-primary" style="width:100%; margin-top:30px; padding:20px; font-size:1.2rem;" onclick="generateDocument()">Generate Formal Report</button>
+    </div>
+
+    <div id="report-output">
+        <div class="section-title">PRIMARY MINISTRY STRENGTHS</div>
+        <div id="identified-gifts-container"></div>
+
+        <div class="section-title" style="background: #f1f5f9; color: #475569;">APPENDIX: FULL CATEGORY DESCRIPTIONS</div>
+        <div id="appendix-container"></div>
+        
+        <div style="margin-top: 50px; display: flex; gap: 15px;" class="no-print-tools-inline">
+            <button class="btn btn-primary" onclick="downloadPDF()" style="flex:2">Download as PDF Document</button>
+            <button class="btn" onclick="window.location.reload()" style="flex:1">Restart Inventory</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { id: 1, text: "I prefer ministering by myself rather than in a group.", cat: "G" },
+        { id: 2, text: "People often say I am impulsive and direct.", cat: "F" },
+        { id: 3, text: "My financial resources are above average.", cat: "A" },
+        { id: 4, text: "I like to counsel people on a short-term basis.", cat: "D" },
+        { id: 5, text: "I am a task-oriented person.", cat: "G" },
+        { id: 6, text: "I love directing other people's work.", cat: "B" },
+        { id: 7, text: "It's natural for me to show kindness to people.", cat: "E" },
+        { id: 8, text: "People learn easily from me.", cat: "C" },
+        { id: 9, text: "I can be very persuasive.", cat: "F" },
+        { id: 10, text: "More than 10 percent of my income goes for Christian causes.", cat: "A" },
+        { id: 11, text: "People often follow my advice.", cat: "D" },
+        { id: 12, text: "I normally use several books in lesson preparation.", cat: "C" },
+        { id: 13, text: "I like to recruit and lead people.", cat: "B" },
+        { id: 14, text: "One-on-one relationships are important to me.", cat: "E" },
+        { id: 15, text: "I possess a variety of talents and abilities.", cat: "G" },
+        { id: 16, text: "I want to measure everything by God's Word.", cat: "F" },
+        { id: 17, text: "Material possessions don't mean much to me.", cat: "A" },
+        { id: 18, text: "Discouraged people are encouraged by my words.", cat: "D" },
+        { id: 19, text: "Being accurate and truthful are important to me.", cat: "C" },
+        { id: 20, text: "I love the challenge of accomplishing an organization goal.", cat: "G" },
+        { id: 21, text: "Other people's spiritual welfare genuinely concerns me.", cat: "D" },
+        { id: 22, text: "I usually make quick decisions.", cat: "F" },
+        { id: 23, text: "I look for ways to help the unfortunate and downtrodden.", cat: "E" },
+        { id: 24, text: "Criticism doesn't bother me.", cat: "C" },
+        { id: 25, text: "I often volunteer my time and talents to worthwhile causes.", cat: "G" },
+        { id: 26, text: "I am usually self-confident.", cat: "B" },
+        { id: 27, text: "I don't expect repayment for favors I do for others.", cat: "E" },
+        { id: 28, text: "I enjoy being responsible for the success of the group.", cat: "B" },
+        { id: 29, text: "When a question about truth comes up, I am normally right.", cat: "F" },
+        { id: 30, text: "Deadlines challenge me, and I usually meet them on time.", cat: "B" },
+        { id: 31, text: "People in pain are comforted by my presence.", cat: "D" }
+    ];
+
+    const database = {
+        A: { title: "GIVING", level: "A", text: "You contribute material resources, and do God’s work with liberality and cheerfulness. You contribute sacrificially, motivate others, and don’t shun pressure or publicity. Romans 12:13 – “Share with God’s people.”" },
+        B: { title: "ADMINISTRATION", level: "B", text: "You lead and communicate in such a way that people work harmoniously to reach goals for God’s purpose. You enjoy being a leader and can endure adverse reaction to get the job done. You enjoy seeing tasks complete; are able to set guidelines, schedules, and policies; and can delegate to get the work done. Romans 12:14 – “Bless those who persecute you.”" },
+        C: { title: "TEACHING", level: "C", text: "You communicate the truth with obvious results. You believe your gift is foundational and work systematically and with accuracy. Romans 12:11 – “Keep spiritual fervor.”" },
+        D: { title: "EXHORTATION", level: "D", text: "You minister by giving comfort, consolation, and encouragement so people feel helped and healed. Problems are only challenges, and you are drawn to those seeking spiritual growth. You can share personal failures to prompt others to talk. Learning and teaching practical information is your desire. Romans 12:12 – “Joyful, patient and faithful.”" },
+        E: { title: "MERCY", level: "E", text: "You feel compassion for those who are suffering and perform deeds to reflect God’s love. You are naturally drawn to hurting people, sensitive, giving, loving and desire healing. Romans 12:15-16 – “Rejoice with those who rejoice, mourn with mourners, live in harmony.”" },
+        F: { title: "PROPHECY", level: "F", text: "The goal of those who have the gift of prophecy is to bring persons face to face with God. You discern, reveal motives and actions, have strong convictions and a need to express them. Impulsive, direct, and persuasive, you normally are a strong person. Romans 12:9 – “Love must be sincere, hate evil, cling to good.”" },
+        G: { title: "SERVING", level: "G", text: "You identify and meet the needs of others using personal as well as other resources. You see needs and enjoy responding. You work best short-term and alone (do it now and quickly). You possess endurance and stamina and have a tendency to do too much. Romans 12:10 – “Be devoted, honor one another.”" }
+    };
+
+    const listEl = document.getElementById('questions-list');
+    questions.forEach(q => {
+        listEl.innerHTML += `
+            <div class="question-row">
+                <input type="checkbox" id="q${q.id}" data-cat="${q.cat}" style="transform: scale(1.4); margin-right: 15px;">
+                <label class="question-text" for="q${q.id}">${q.text}</label>
+                <span class="cat-badge">${q.cat}</span>
+            </div>
+        `;
+    });
+
+    function generateDocument() {
+        const scores = {A:0, B:0, C:0, D:0, E:0, F:0, G:0};
+        document.querySelectorAll('input:checked').forEach(i => scores[i.dataset.cat]++);
+
+        const idContainer = document.getElementById('identified-gifts-container');
+        const appContainer = document.getElementById('appendix-container');
+        idContainer.innerHTML = '';
+        appContainer.innerHTML = '';
+
+        Object.keys(database).forEach(key => {
+            const gift = database[key];
+            const score = scores[key];
+            
+            if (score >= 3) {
+                idContainer.innerHTML += `
+                    <div class="gift-card">
+                        <div class="gift-header">
+                            <span class="level-indicator">${gift.level}: ${gift.title}</span>
+                            <span class="score-pill">Frequency: ${score}/5</span>
+                        </div>
+                        <p style="margin:0;">${gift.text}</p>
+                    </div>
+                `;
+            }
+            
+            // Add all to appendix for full reference
+            appContainer.innerHTML += `
+                <div class="appendix-item">
+                    <span class="appendix-label">${gift.level} - ${gift.title}:</span> ${gift.text}
+                </div>
+            `;
+        });
+
+        if (idContainer.innerHTML === '') idContainer.innerHTML = '<p>No primary gifts were identified with a score of 3 or higher.</p>';
+
+        document.getElementById('form-view').style.display = 'none';
+        document.getElementById('report-output').style.display = 'block';
+        window.scrollTo(0,0);
+    }
+
+    function toggleTheme() {
+        const b = document.body;
+        b.dataset.theme = b.dataset.theme === 'dark' ? 'light' : 'dark';
+    }
+
+    function downloadPDF() {
+        const element = document.getElementById('printable-doc');
+        const opt = {
+            margin: [10, 10],
+            filename: 'Spiritual_Gifts_Full_Report.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
+</body>
+</html>
