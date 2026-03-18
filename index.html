@@ -1,136 +1,135 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spiritual Gifts Inventory</title>
-    
-	<!-- ✅ Open Graph -->
-    <meta property="og:title" content="Spiritual Gifts Inventory" />
-    <meta property="og:description" content="Discover your spiritual gifts based on Romans 12. Take the assessment and generate your report instantly." />
-    <meta property="og:image" content="https://spiritualgifts-zeta.vercel.app/preview.png" />
-    <meta property="og:url" content="https://spiritualgifts-zeta.vercel.app/" />
-    <meta property="og:type" content="website" />
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Spiritual Gifts Inventory</title>
+		
+		<!-- ✅ Open Graph -->
+		<meta property="og:title" content="Spiritual Gifts Inventory" />
+		<meta property="og:description" content="Discover your spiritual gifts based on Romans 12." />
+		<meta property="og:image" content="https://spiritualgifts-zeta.vercel.app/preview.png" />
+		<meta property="og:url" content="https://spiritualgifts-zeta.vercel.app/" />
+		<meta property="og:type" content="website" />
 
-    <!-- ✅ Twitter (optional but recommended) -->
-    <meta name="twitter:card" content="summary_large_image" />
+		<!-- ✅ Twitter (optional but recommended) -->
+		<meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="stylesheet" href="css/styles.css">
-    <!-- External CSS -->
-    <link rel="stylesheet" href="css/styles.css">
-    
-    <!-- html2pdf Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-</head>
-<body>
+		<!-- External CSS -->
+		<link rel="stylesheet" href="css/styles.css">
+		
+		<!-- html2pdf Library -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+	</head>
+	<body>
 
-    <!-- PDF Template (Hidden) -->
-    <div id="pdf-template" style="display: none;">
-        <div style="text-align: center; border-bottom: 3px solid #1e293b; padding-bottom: 20px; margin-bottom: 30px;">
-            <h1 style="font-size: 28px; font-weight: bold; color: #1e293b; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 2px;">Spiritual Gifts Inventory</h1>
-            <p style="font-size: 14px; color: #64748b; margin: 0; font-style: italic;">Official Assessment Report & Romans 12 Analysis</p>
-            <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;" id="pdf-date"></p>
-        </div>
+		<!-- PDF Template (Hidden) -->
+		<div id="pdf-template" style="display: none;">
+			<div style="text-align: center; border-bottom: 3px solid #1e293b; padding-bottom: 20px; margin-bottom: 30px;">
+				<h1 style="font-size: 28px; font-weight: bold; color: #1e293b; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 2px;">Spiritual Gifts Inventory</h1>
+				<p style="font-size: 14px; color: #64748b; margin: 0; font-style: italic;">Official Assessment Report & Romans 12 Analysis</p>
+				<p style="font-size: 12px; color: #94a3b8; margin-top: 8px;" id="pdf-date"></p>
+			</div>
 
-        <div style="margin-bottom: 30px;">
-            <h2 style="font-size: 18px; color: #2563eb; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #2563eb; padding-left: 12px; margin-bottom: 20px; font-weight: bold;">Primary Ministry Strengths</h2>
-            <div id="pdf-primary-gifts"></div>
-        </div>
+			<div style="margin-bottom: 30px;">
+				<h2 style="font-size: 18px; color: #2563eb; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #2563eb; padding-left: 12px; margin-bottom: 20px; font-weight: bold;">Primary Ministry Strengths</h2>
+				<div id="pdf-primary-gifts"></div>
+			</div>
 
-        <div style="margin-top: 40px; page-break-before: always;">
-            <h2 style="font-size: 18px; color: #475569; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #475569; padding-left: 12px; margin-bottom: 20px; font-weight: bold;">Complete Gift Profile</h2>
-            <div id="pdf-all-gifts"></div>
-        </div>
+			<div style="margin-top: 40px; page-break-before: always;">
+				<h2 style="font-size: 18px; color: #475569; text-transform: uppercase; letter-spacing: 1px; border-left: 4px solid #475569; padding-left: 12px; margin-bottom: 20px; font-weight: bold;">Complete Gift Profile</h2>
+				<div id="pdf-all-gifts"></div>
+			</div>
 
-        <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8; font-style: italic;">
-            <p>This report is based on the Spiritual Gifts Inventory assessment based on Romans 12.</p>
-            <p style="margin-top: 5px;">Generated on <span id="pdf-footer-date"></span></p>
-        </div>
-    </div>
+			<div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8; font-style: italic;">
+				<p>This report is based on the Spiritual Gifts Inventory assessment based on Romans 12.</p>
+				<p style="margin-top: 5px;">Generated on <span id="pdf-footer-date"></span></p>
+			</div>
+		</div>
 
-    <!-- Main UI -->
-    <div class="controls no-print">
-        <button class="btn" onclick="toggleLanguage()" id="lang-btn">
-            <span id="lang-flag">🇵🇭</span>
-            <span id="lang-text">Tagalog</span>
-        </button>
-        <button class="btn btn-secondary" onclick="toggleTheme()">
-            <span id="theme-icon">🌙</span>
-        </button>
-    </div>
+		<!-- Main UI -->
+		<div class="controls no-print">
+			<button class="btn" onclick="toggleLanguage()" id="lang-btn">
+				<span id="lang-flag">🇵🇭</span>
+				<span id="lang-text">Tagalog</span>
+			</button>
+			<button class="btn btn-secondary" onclick="toggleTheme()">
+				<span id="theme-icon">🌙</span>
+			</button>
+		</div>
 
-    <div class="container" id="printable-doc">
-        <header>
-            <h1 id="main-title">Spiritual Gifts Inventory</h1>
-            <div class="subtitle" id="sub-title">A method to help you discover your gifts. Check the items which best describe you.</div>
-        </header>
+		<div class="container" id="printable-doc">
+			<header>
+				<h1 id="main-title">Spiritual Gifts Inventory</h1>
+				<div class="subtitle" id="sub-title">A method to help you discover your gifts. Check the items which best describe you.</div>
+			</header>
 
-        <div id="form-view">
-            <div class="progress-container no-print">
-                <div class="progress-header">
-                    <span id="progress-text">Progress</span>
-                    <span id="progress-count">0/31 selected</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-bar"></div>
-                </div>
-            </div>
+			<div id="form-view">
+				<div class="progress-container no-print">
+					<div class="progress-header">
+						<span id="progress-text">Progress</span>
+						<span id="progress-count">0/31 selected</span>
+					</div>
+					<div class="progress-bar">
+						<div class="progress-fill" id="progress-bar"></div>
+					</div>
+				</div>
 
-            <div class="instruction" id="instruction-text">
-                Click anywhere on a row to select statements that describe you
-            </div>
+				<div class="instruction" id="instruction-text">
+					Click anywhere on a row to select statements that describe you
+				</div>
 
-            <div class="questions-list" id="questions-list"></div>
+				<div class="questions-list" id="questions-list"></div>
 
-            <button class="btn btn-primary" id="btn-discover" onclick="generateDocument()">
-                Discover My Spiritual Gifts
-            </button>
-        </div>
+				<button class="btn btn-primary" id="btn-discover" onclick="generateDocument()">
+					Discover My Spiritual Gifts
+				</button>
+			</div>
 
-        <div id="report-output">
-            <div class="section-title" id="title-strengths">Primary Ministry Strengths</div>
-            <div id="identified-gifts-container"></div>
+			<div id="report-output">
+				<div class="section-title" id="title-strengths">Primary Ministry Strengths</div>
+				<div id="identified-gifts-container"></div>
 
-            <div class="section-title" id="title-appendix" style="background: linear-gradient(135deg, #f1f5f9, transparent); color: #475569;">
-                Complete Gift Descriptions
-            </div>
-            <div id="appendix-container"></div>
+				<div class="section-title" id="title-appendix" style="background: linear-gradient(135deg, #f1f5f9, transparent); color: #475569;">
+					Complete Gift Descriptions
+				</div>
+				<div id="appendix-container"></div>
 
-            <div class="video-section no-print">
-                <div class="section-title" id="title-resources">Recommended Growth Resources</div>
-                <div class="video-grid">
-                    <div class="video-card">
-                        <div class="video-title">7 Habits of Spirit-Filled Believers</div>
-                        <div class="video-wrapper">
-                            <iframe src="https://www.youtube.com/embed/GT0fro5ANcM" allowfullscreen loading="lazy"></iframe>
-                        </div>
-                    </div>
-                    <div class="video-card">
-                        <div class="video-title">Fruit of the Spirit (Galatians 5:22-23)</div>
-                        <div class="video-wrapper">
-                            <iframe src="https://www.youtube.com/embed/qG9SbXG9BaY" allowfullscreen loading="lazy"></iframe>
-                        </div>
-                    </div>
-                </div>
-            </div>
+				<div class="video-section no-print">
+					<div class="section-title" id="title-resources">Recommended Growth Resources</div>
+					<div class="video-grid">
+						<div class="video-card">
+							<div class="video-title">7 Habits of Spirit-Filled Believers</div>
+							<div class="video-wrapper">
+								<iframe src="https://www.youtube.com/embed/GT0fro5ANcM" allowfullscreen loading="lazy"></iframe>
+							</div>
+						</div>
+						<div class="video-card">
+							<div class="video-title">Fruit of the Spirit (Galatians 5:22-23)</div>
+							<div class="video-wrapper">
+								<iframe src="https://www.youtube.com/embed/qG9SbXG9BaY" allowfullscreen loading="lazy"></iframe>
+							</div>
+						</div>
+					</div>
+				</div>
 
-            <div class="action-bar no-print">
-          <!--           <button class="btn btn-primary btn-full" id="btn-pdf" onclick="downloadPDF()">
-                    📄 Download PDF Report
-                </button> -->
-                <button class="btn btn-primary btn-full" id="btn-reset" onclick="resetTest()">
-                    🔄 Start Over
-                </button>
-            </div>
-        </div>
-    </div>
+				<div class="action-bar no-print">
+			  <!--           <button class="btn btn-primary btn-full" id="btn-pdf" onclick="downloadPDF()">
+						📄 Download PDF Report
+					</button> -->
+					<button class="btn btn-primary btn-full" id="btn-reset" onclick="resetTest()">
+						🔄 Start Over
+					</button>
+				</div>
+			</div>
+		</div>
 
-    <div class="toast" id="toast"></div>
+		<div class="toast" id="toast"></div>
 
-    <!-- External JavaScript Files -->
-    <script src="js/ui-text.js"></script>
-    <script src="js/data.js"></script>
-    <script src="js/app.js"></script>
+		<!-- External JavaScript Files -->
+		<script src="js/ui-text.js"></script>
+		<script src="js/data.js"></script>
+		<script src="js/app.js"></script>
 
-</body>
-</html>
+	</body>
+	</html>
